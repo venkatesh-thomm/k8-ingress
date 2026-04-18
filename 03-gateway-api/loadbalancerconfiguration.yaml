@@ -1,0 +1,8 @@
+apiVersion: gateway.k8s.aws/v1beta1
+kind: LoadBalancerConfiguration
+metadata:
+  name: my-alb-config
+  namespace: default
+spec:
+  scheme: internet-facing
+  ipAddressType: ipv4

@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app2
+  labels:
+    project: roboshop
+    tier: frontend
+    component: app2
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      project: roboshop
+      tier: frontend
+      component: app2
+  template:
+    metadata:
+      labels:
+        project: roboshop
+        tier: frontend
+        component: app2
+    spec:
+      containers:
+      - name: app2
+        image: joindevops/app2:1.0.0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app2
+spec:
+  selector:
+    project: roboshop
+    tier: frontend
+    component: app2
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+# CURRENT WAY: networking.k8s.io/v1 with AWS ALB annotations
+# AWS Load Balancer Controller watches this resource and provisions an ALB on AWS
+# group.name: roboshop means both app1 and app2 share ONE ALB (cost saving)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app2
+  annotations:
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/certificate-arn: 'arn:aws:acm:us-east-1:160885265516:certificate/b6983d9a-848d-4898-8335-81c74db10bc3'
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/tags: Environment=dev,Project=roboshop
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/group.name: roboshop
+spec:
+  ingressClassName: alb
+  rules:
+  - host: "app2.daws88s.online"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: app2
+            port:
+              number: 80
