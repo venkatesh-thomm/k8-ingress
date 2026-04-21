@@ -6,3 +6,7 @@ metadata:
 spec:
   scheme: internet-facing
   ipAddressType: ipv4
+  listeners:
+    https:
+      certificates:
+      - certificateARN: <ACM_CERT_ARN>

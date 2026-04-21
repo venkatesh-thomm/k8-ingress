@@ -51,6 +51,7 @@ metadata:
 spec:
   parentRefs:
   - name: my-gateway
+    sectionName: https
   hostnames:
   - "app1.daws88s.online"
   rules:
